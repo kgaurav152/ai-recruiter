@@ -1,11 +1,13 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FaMicrophoneAlt } from "react-icons/fa";
 import { supabase } from "@/services/supabaseClient";
-import Link from "next/link";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -39,13 +41,16 @@ const SignUpPage = () => {
   const handleSignUp = async (data: any) => {
     setLoading(true);
     try {
+      const firstLetter = data.name.charAt(0).toUpperCase();
+      const pictureUrl = `https://placehold.co/128x128/E0E0E0/A0A0A0/png?text=${firstLetter}`;
+
       const { error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
           data: {
             name: data.name,
-            picture: "https://placehold.co/128x128/E0E0E0/A0A0A0/png?text=A",
+            picture: pictureUrl,
           },
         },
       });
@@ -55,18 +60,18 @@ const SignUpPage = () => {
       const { error: insertError } = await supabase.from("Users").insert({
         email: data.email,
         name: data.name,
-        picture: "https://placehold.co/128x128/E0E0E0/A0A0A0/png?text=A",
+        picture: pictureUrl,
       });
 
       if (insertError) throw insertError;
 
       form.reset();
-      alert(
+      toast(
         "Signup successful! Please check your email to verify your account."
       );
     } catch (err: any) {
       console.error("Signup error:", err.message);
-      alert(err.message);
+      toast(err.message);
     } finally {
       setLoading(false);
     }
