@@ -42,7 +42,7 @@ const InterviewLink = ({
       `mailto:?subject=Recruitron - AI Interview Link & body=Interview Link: ${url}`,
       "_blank"
     );
-  }
+  };
   const sendOnSlack = () => {
     window.open(
       `https://slack.com/app_redirect?channel=${encodeURIComponent(
@@ -50,7 +50,7 @@ const InterviewLink = ({
       )}&url=${encodeURIComponent(url)}`,
       "_blank"
     );
-  }
+  };
   return (
     <div className="flex flex-col items-center justify-center gap-2 mt-5 p-5">
       <CircleCheckBig className="bg-green-500 h-18 w-18 rounded-full" />

@@ -1,13 +1,13 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FcGoogle } from "react-icons/fc";
 import { FaMicrophoneAlt } from "react-icons/fa";
 import { supabase } from "@/services/supabaseClient";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +29,8 @@ const signinSchema = z.object({
 const SignInPage = () => {
   const [loading, setLoading] = useState(false);
 
+  const router = useRouter();
+
   const form = useForm({
     resolver: zodResolver(signinSchema),
     defaultValues: {
@@ -48,11 +50,11 @@ const SignInPage = () => {
       if (error) throw error;
 
       form.reset();
-      alert("Sign in successful!");
-      redirect(`${process.env.NEXT_PUBLIC_HOST_URL}/dashboard`);
+      toast("Sign in successful!");
+      router.push("/dashboard");
     } catch (err: any) {
       console.error("Sign in error:", err.message);
-      alert(err.message);
+      toast(err.message);
     } finally {
       setLoading(false);
     }

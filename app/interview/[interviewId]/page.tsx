@@ -19,7 +19,7 @@ interface interviewDataType {
 
 type Params = {
   interviewId: string;
-}
+};
 const Interview = () => {
   const { interviewId } = useParams() as Partial<Params>;
   const [interviewData, setInterviewData] =
@@ -37,10 +37,10 @@ const Interview = () => {
     setLoading(true);
     try {
       let { data: Interview, error } = await supabase
-        .from("Interview")
+        .from("Interviews")
         .select("jobPosition,jobDescription,duration,type")
         .eq("interview_id", interviewId);
-        // @ts-ignore
+      // @ts-ignore
       setInterviewData(Interview[0]);
       setLoading(false);
       if (Interview?.length === 0) {
@@ -56,14 +56,14 @@ const Interview = () => {
   const onJoinInterview = async () => {
     setLoading(true);
     let { data: Interview, error } = await supabase
-      .from("Interview")
+      .from("Interviews")
       .select("*")
       .eq("interview_id", interviewId);
     setInterviewInfo({
-        userName,
-        userEmail,
-        // @ts-ignore
-        interviewData: Interview[0],
+      userName,
+      userEmail,
+      // @ts-ignore
+      interviewData: Interview[0],
     });
     router.push(`/interview/${interviewId}/start`);
     setLoading(false);
@@ -119,7 +119,7 @@ const Interview = () => {
             disabled={loading || !userName}
             onClick={onJoinInterview}
           >
-            <Video /> {loading && <Loader2Icon/>} Join Interview
+            <Video /> {loading && <Loader2Icon />} Join Interview
           </Button>
         </div>
       </div>

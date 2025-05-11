@@ -57,7 +57,7 @@ const QuestionList = ({
     setLoading2(true);
     const interview_id = uuid();
     const { data, error } = await supabase
-      .from("Interview")
+      .from("Interviews")
       .insert([
         {
           ...formData,

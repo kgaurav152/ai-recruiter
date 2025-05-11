@@ -17,11 +17,11 @@ const AllInterview = () => {
   }, [user]);
   const GetInterviewList = async () => {
     let { data: Interview, error } = await supabase
-      .from("Interview")
+      .from("Interviews")
       .select("*")
       .eq("userEmail", user?.email)
       .order("created_at", { ascending: false });
-      // @ts-ignore
+    // @ts-ignore
     setInterviewsList(Interview);
   };
 

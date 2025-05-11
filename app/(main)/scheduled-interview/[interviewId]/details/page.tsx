@@ -8,7 +8,7 @@ import CandidateList from "../../_components/CandidateList";
 
 type Params = {
   interviewId: string;
-}
+};
 const InterviewDetail = () => {
   const { interviewId } = useParams() as Partial<Params>;
   const { user } = userDetails();
@@ -19,7 +19,7 @@ const InterviewDetail = () => {
   }, [user]);
   const GetInterviewDetails = async () => {
     const result = await supabase
-      .from("Interview")
+      .from("Interviews")
       .select(
         `jobPosition,duration,interview_id,jobDescription,type,questionList,created_at,interview-feedback(userEmail,feedback,userName,created_at)`
       )
@@ -37,7 +37,9 @@ const InterviewDetail = () => {
         <>
           <InterviewDetailContainer interviewDetails={interviewDetails} />
           {/* @ts-ignore */}
-          <CandidateList candidateList={interviewDetails["interview-feedback"]} />
+          <CandidateList
+            candidateList={interviewDetails["interview-feedback"]}
+          />
         </>
       )}
     </div>
