@@ -6,51 +6,42 @@ import React, { useContext, useEffect, useState } from "react";
 const Provider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
-  const createNewUser = () => {
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (!user) {
-        setUser(null);
-        setLoading(false);
-        return;
-      }
-      let { data: Users, error } = await supabase
-        .from("Users")
-        .select("*")
-        .eq("email", user?.email);
-      if (Users?.length === 0) {
-        const { data, error } = await supabase.from("Users").insert({
-          email: user?.email,
-          name: user?.user_metadata?.name,
-          picture: user?.user_metadata?.picture,
-        });
-        if (error) {
-          console.error("Insert error:", error.message);
-          setLoading(false);
-        } else {
-          setUser(data);
-          console.log("User inserted:", data);
-          setLoading(false);
-          return;
+
+  const fetchUser = async () => {
+    try {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+      if (error) throw error;
+
+      if (session?.user) {
+        const { data: Users, error: fetchError } = await supabase
+          .from("Users")
+          .select("*")
+          .eq("email", session.user.email);
+        if (fetchError) throw fetchError;
+
+        if (Users?.length > 0) {
+          setUser(Users[0] as UserType);
         }
       }
-      //ts-ignore
-      setUser(Users?.[0]);
+    } catch (err: any) {
+      console.error("Error fetching user:", err.message);
+    } finally {
       setLoading(false);
-    });
+    }
   };
-  useEffect(() => {
-    // Initial fetch
-    createNewUser();
 
-    // Listen for login/logout
+  useEffect(() => {
+    fetchUser();
+
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        if (session) {
-          createNewUser();
+        if (session?.user) {
+          fetchUser();
         } else {
-          // User is logged out
           setUser(null);
-          setLoading(false); // Stop loader
         }
       }
     );
@@ -58,6 +49,7 @@ const Provider = ({ children }: { children: React.ReactNode }) => {
       listener?.subscription.unsubscribe();
     };
   }, []);
+
   return (
     <UserDetailsContext.Provider value={{ user, setUser, loading }}>
       {children}
