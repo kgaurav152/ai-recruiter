@@ -10,7 +10,12 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading && !user && pathname?.startsWith("/auth") === false) {
+    if (
+      !loading &&
+      !user &&
+      pathname !== "/" &&
+      pathname?.startsWith("/auth") === false
+    ) {
       router.replace("/auth");
     }
     // if (!loading && user && pathname === "/") {
@@ -18,8 +23,13 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     // }
   }, [user, loading, pathname]);
 
-  if (loading) return <div className="h-screen w-[100vw] flex items-center justify-center"><Loader2Icon className="animate-spin w-32 h-32" /></div>;
-1
+  if (loading)
+    return (
+      <div className="h-screen w-[100vw] flex items-center justify-center">
+        <Loader2Icon className="animate-spin w-32 h-32" />
+      </div>
+    );
+  1;
   return <>{children}</>;
 };
 
