@@ -1,6 +1,6 @@
 "use client";
 import { InterviewDataContext } from "@/context/InterviewDataContext";
-import { Loader2Icon, Mic, Phone, Timer } from "lucide-react";
+import { Loader2Icon, Mic, Phone, Timer, WebcamIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import AI_RecruiterLogo from "@/assets/images/AI-Recruiter.png";
@@ -11,6 +11,28 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/services/supabaseClient";
 import { useParams, useRouter } from "next/navigation";
+// import dynamic from "next/dynamic";
+import WebCam from "react-webcam";
+
+// interface WebcamProps {
+//   audio: boolean;
+//   videoConstraints?: MediaTrackConstraints;
+//   onUserMedia?: (stream: MediaStream) => void;
+//   onUserMediaError?: (error: string | DOMException) => void;
+//   screenshotFormat?: "image/webp" | "image/png" | "image/jpeg";
+//   className?: string;
+// }
+
+// Dynamically import Webcam to avoid SSR issues
+// const Webcam = dynamic<WebcamProps>(
+//   () => import("react-webcam").then((mod) => mod.default),
+//   {
+//     ssr: false,
+//     loading: () => (
+//       <WebcamIcon className="min-w-24 min-h-24 text-muted-foreground" />
+//     ),
+//   }
+// );
 
 type Params = {
   interviewId: string;
@@ -27,6 +49,7 @@ const StartInterview = () => {
   const [interviewDuration, setInterviewDuration] = useState(0); // in seconds
   const router = useRouter();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [isWebCamEnabled, setIsWebCamEnabled] = useState(false);
 
   useEffect(() => {
     conversationRef.current = conversation;
@@ -40,6 +63,23 @@ const StartInterview = () => {
     } catch (error) {
       toast.error("Microphone access is required to start the interview.");
       return false;
+    }
+  };
+
+  const requestWebcamPermission = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        // audio: false,
+      });
+      // Immediately stop the tracks to release the webcam
+      stream.getTracks().forEach((track) => track.stop());
+      setIsWebCamEnabled(true);
+      return true;
+    } catch (error) {
+      toast.error("Webcam access is required for video feature");
+      return false;
+    } finally {
     }
   };
 
@@ -116,7 +156,8 @@ const StartInterview = () => {
     const autoStartInterview = async () => {
       if (!interviewInfo) return;
       const hasPermission = await requestMicPermission();
-      if (hasPermission) {
+      const hasCamPermission = await requestWebcamPermission();
+      if (hasPermission && hasCamPermission) {
         startInterview();
       }
     };
@@ -242,7 +283,7 @@ const StartInterview = () => {
           </div>
           <h2 className="text-lg font-bold text-zinc-200">AI Recruiter</h2>
         </div>
-        <div className="bg-[rgb(16,23,39)] rounded-md p-10 border border-gray-600 flex items-center justify-center">
+        {/* <div className="bg-[rgb(16,23,39)] rounded-md p-10 border border-gray-600 flex items-center justify-center">
           <div className="bg-gray-500 rounded-full w-[150px] h-[150px] flex items-center justify-center">
             <div className="relative w-[150px] h-[150px] flex items-center justify-center">
               {activeUser && (
@@ -252,6 +293,35 @@ const StartInterview = () => {
                 {interviewInfo?.userName}
               </h2>
             </div>
+          </div>
+        </div> */}
+
+        {/* Replace the second div with the webcam component */}
+        <div className="bg-[rgb(16,23,39)] rounded-md p-4 border border-gray-600 flex flex-col items-center justify-center">
+          <div className="w-full h-full flex flex-col items-center justify-center">
+            {isWebCamEnabled ? (
+              <WebCam
+                audio={false}
+                onUserMedia={() => setIsWebCamEnabled(true)}
+                onUserMediaError={() => {
+                  setIsWebCamEnabled(false);
+                  toast.error("Could not access webcam");
+                }}
+                className="w-full h-full max-h-[300px] object-cover rounded-md"
+                screenshotFormat="image/jpeg"
+              />
+            ) : (
+              <div className="w-full h-[300px] bg-gray-800 rounded-md flex items-center justify-center">
+                <WebcamIcon className="w-24 h-24 text-gray-500" />
+              </div>
+            )}
+            {/* <Button
+              onClick={() => setIsWebCamEnabled(!isWebCamEnabled)}
+              className="mt-4"
+              variant={isWebCamEnabled ? "destructive" : "default"}
+            >
+              {isWebCamEnabled ? "Disable Webcam" : "Enable Webcam"}
+            </Button> */}
           </div>
         </div>
       </div>
