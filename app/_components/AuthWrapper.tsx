@@ -14,6 +14,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
       !loading &&
       !user &&
       pathname !== "/" &&
+      !pathname?.startsWith("/interview") &&
       pathname?.startsWith("/auth") === false
     ) {
       router.replace("/auth");
