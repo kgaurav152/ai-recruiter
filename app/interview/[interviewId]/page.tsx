@@ -116,7 +116,7 @@ const Interview = () => {
         <div className="w-full">
           <Button
             className="mt-5 w-full cursor-pointer hover:bg-blue-600 hover:text-white transition-all duration-300 font-bold"
-            disabled={loading || !userName}
+            disabled={loading || !userName || !interviewData}
             onClick={onJoinInterview}
           >
             <Video /> {loading && <Loader2Icon />} Join Interview
