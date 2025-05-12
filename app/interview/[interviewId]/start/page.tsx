@@ -11,28 +11,7 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/services/supabaseClient";
 import { useParams, useRouter } from "next/navigation";
-// import dynamic from "next/dynamic";
 import WebCam from "react-webcam";
-
-// interface WebcamProps {
-//   audio: boolean;
-//   videoConstraints?: MediaTrackConstraints;
-//   onUserMedia?: (stream: MediaStream) => void;
-//   onUserMediaError?: (error: string | DOMException) => void;
-//   screenshotFormat?: "image/webp" | "image/png" | "image/jpeg";
-//   className?: string;
-// }
-
-// Dynamically import Webcam to avoid SSR issues
-// const Webcam = dynamic<WebcamProps>(
-//   () => import("react-webcam").then((mod) => mod.default),
-//   {
-//     ssr: false,
-//     loading: () => (
-//       <WebcamIcon className="min-w-24 min-h-24 text-muted-foreground" />
-//     ),
-//   }
-// );
 
 type Params = {
   interviewId: string;
