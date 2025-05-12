@@ -14,18 +14,23 @@ import { useParams, useRouter } from "next/navigation";
 
 type Params = {
   interviewId: string;
-}
+};
 const StartInterview = () => {
   //@ts-ignore
   const { interviewInfo, setInterviewInfo } = useContext(InterviewDataContext);
   const [activeUser, setActiveUser] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [conversation, setConversation] = useState<any>();
+  const conversationRef = useRef<any>(null);
   const { interviewId } = useParams() as Partial<Params>;
   const vapiRef = useRef<any>(null);
   const [interviewDuration, setInterviewDuration] = useState(0); // in seconds
   const router = useRouter();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    conversationRef.current = conversation;
+  }, [conversation]);
 
   const requestMicPermission = async () => {
     try {
@@ -53,10 +58,10 @@ const StartInterview = () => {
     }
 
     const handleMessage = (message: any) => {
-      console.log("message", message);
+      // console.log("message", message);
       if (message?.conversation) {
         const convoString = JSON.stringify(message?.conversation);
-        console.log("Conversation String", convoString);
+        // console.log("Conversation String", convoString);
         setConversation(convoString);
       }
     };
@@ -72,16 +77,16 @@ const StartInterview = () => {
     });
 
     vapi.on("speech-start", () => {
-      console.log("Assistant speech has started");
+      // console.log("Assistant speech has started");
       setActiveUser(false);
     });
     vapi.on("speech-end", () => {
-      console.log("Assistant speech has ended");
+      // console.log("Assistant speech has ended");
       setActiveUser(true);
     });
 
     vapi.on("call-end", () => {
-      console.log("Call has ended");
+      // console.log("Call has ended");
       toast.success("Interview ended successfully");
       if (timerRef.current) clearInterval(timerRef.current);
       GenerateFeedBack();
@@ -124,7 +129,7 @@ const StartInterview = () => {
       interviewInfo?.interviewData?.questionList
         ?.map((item: any) => item.question)
         .join(" Next Question is: ") || "";
-    console.log(questionList);
+    // console.log(questionList);
 
     const assistantOptions = {
       name: "AI Recruiter",
@@ -145,25 +150,25 @@ const StartInterview = () => {
           {
             role: "system",
             content: `You are an AI voice assistant conducting interviews.
-Your job is to ask candidates provided interview questions, assess their responses.
-Begin the conversation with a friendly introduction, setting a relaxed yet professional tone. Example:
-"Hey there! Welcome to your ${interviewInfo?.interviewData?.jobPosition} interview. Let's get started with a few questions!"
-Ask one question at a time and wait for the candidate's response before proceeding. Keep the questions clear and concise. Below Are the questions ask one by one:
-Questions: ${questionList}
-If the candidate struggles, offer hints or rephrase the question without giving away the answer. Example:
-"Need a hint? Think about how React tracks component updates!"
-Provide brief, encouraging feedback after each answer. Example:
-"Nice! That's a solid answer."
-"Hmm, not quite! Want to try again?"
-Keep the conversation natural and engaging-use casual phrases like "Alright, next up..." or "Let's tackle a tricky one!" After 5-7 questions, wrap up the interview smoothly by summarizing their performance. Example:
-"That was great! You handled some tough questions well. Keep sharpening your skills!"
-End on a positive note:
-"Thanks for chatting! Hope to see you crushing projects soon!"
-Key Guidelines:
-✅ Be friendly, engaging, and witty
-✅ Keep responses short and natural, like a real conversation
-✅ Adapt based on the candidate's confidence level
-.`.trim(),
+            Your job is to ask candidates provided interview questions, assess their responses.
+            Begin the conversation with a friendly introduction, setting a relaxed yet professional tone. Example:
+            "Hey there! Welcome to your ${interviewInfo?.interviewData?.jobPosition} interview. Let's get started with a few questions!"
+            Ask one question at a time and wait for the candidate's response before proceeding. Keep the questions clear and concise. Below Are the questions ask one by one:
+            Questions: ${questionList}
+            If the candidate struggles, offer hints or rephrase the question without giving away the answer. Example:
+            "Need a hint? Think about how React tracks component updates!"
+            Provide brief, encouraging feedback after each answer. Example:
+            "Nice! That's a solid answer."
+            "Hmm, not quite! Want to try again?"
+            Keep the conversation natural and engaging-use casual phrases like "Alright, next up..." or "Let's tackle a tricky one!" After 5-7 questions, wrap up the interview smoothly by summarizing their performance. Example:
+            "That was great! You handled some tough questions well. Keep sharpening your skills!"
+            End on a positive note:
+            "Thanks for chatting! Hope to see you crushing projects soon!"
+            Key Guidelines:
+            ✅ Be friendly, engaging, and witty
+            ✅ Keep responses short and natural, like a real conversation
+            ✅ Adapt based on the candidate's confidence level
+            .`.trim(),
           },
         ],
       },
@@ -179,9 +184,9 @@ Key Guidelines:
   const GenerateFeedBack = async () => {
     setLoading(true);
     const result = await axios.post("/api/ai-feedback", {
-      conversation: conversation,
+      conversation: conversationRef.current,
     });
-    console.log("Final Feedback", result);
+    // console.log("Final Feedback", result);
     const Content = result.data.content;
     const match = Content.match(/```json\s*([\s\S]*?)\s*```/);
 
@@ -205,7 +210,7 @@ Key Guidelines:
         },
       ])
       .select();
-    console.log("Feedback Inserted", data);
+    // console.log("Feedback Inserted", data);
     router.replace(`/interview/${interviewId}/completed`);
     setLoading(false);
   };
@@ -256,7 +261,14 @@ Key Guidelines:
           onClick={startMic}
         />
         {/* <AlertConfirmation stopInterview={stopInterview}> */}
-        {!loading ?  <Phone className="h-12 w-12 bg-red-500 p-3 rounded-full cursor-pointer" onClick={stopInterview} /> : <Loader2Icon className="animate-spin"/>}
+        {!loading ? (
+          <Phone
+            className="h-12 w-12 bg-red-500 p-3 rounded-full cursor-pointer"
+            onClick={stopInterview}
+          />
+        ) : (
+          <Loader2Icon className="animate-spin" />
+        )}
         {/* </AlertConfirmation> */}
       </div>
       <h2 className="text-md font-bold mt-5 text-gray-500 text-center">
