@@ -29,38 +29,14 @@ const StartInterview = () => {
   const router = useRouter();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [isWebCamEnabled, setIsWebCamEnabled] = useState(false);
+  const [micAllowed, setMicAllowed] = useState(false);
+  const [camAllowed, setCamAllowed] = useState(false);
+  const [showPermissionRequest, setShowPermissionRequest] = useState(false);
+  const webcamRef = useRef<WebCam>(null);
 
   useEffect(() => {
     conversationRef.current = conversation;
   }, [conversation]);
-
-  const requestMicPermission = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach((track) => track.stop());
-      return true;
-    } catch (error) {
-      toast.error("Microphone access is required to start the interview.");
-      return false;
-    }
-  };
-
-  const requestWebcamPermission = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        // audio: false,
-      });
-      // Immediately stop the tracks to release the webcam
-      stream.getTracks().forEach((track) => track.stop());
-      setIsWebCamEnabled(true);
-      return true;
-    } catch (error) {
-      toast.error("Webcam access is required for video feature");
-      return false;
-    } finally {
-    }
-  };
 
   const formatTime = (seconds: number) => {
     const hrs = String(Math.floor(seconds / 3600)).padStart(2, "0");
@@ -131,13 +107,55 @@ const StartInterview = () => {
     };
   }, []);
 
+  const requestMicPermission = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((track) => track.stop());
+      setMicAllowed(true);
+      return true;
+    } catch (error) {
+      toast.error("Microphone access is required to start the interview.");
+      setMicAllowed(false);
+      setShowPermissionRequest(true);
+      return false;
+    }
+  };
+
+  const requestWebcamPermission = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      stream.getTracks().forEach((track) => track.stop());
+      setCamAllowed(true);
+      setIsWebCamEnabled(true);
+      return true;
+    } catch (error) {
+      toast.error("Webcam access is required for video feature");
+      setCamAllowed(false);
+      setShowPermissionRequest(true);
+      return false;
+    }
+  };
+
+  const requestAllPermissions = async () => {
+    setShowPermissionRequest(false);
+    const micSuccess = await requestMicPermission();
+    const camSuccess = await requestWebcamPermission();
+
+    if (micSuccess && camSuccess) {
+      startInterview();
+    }
+  };
+
   useEffect(() => {
     const autoStartInterview = async () => {
       if (!interviewInfo) return;
       const hasPermission = await requestMicPermission();
       const hasCamPermission = await requestWebcamPermission();
+
       if (hasPermission && hasCamPermission) {
         startInterview();
+      } else {
+        setShowPermissionRequest(true);
       }
     };
     autoStartInterview();
@@ -238,88 +256,139 @@ const StartInterview = () => {
   const startMic = () => {};
 
   return (
-    <div className="p-20 lg:px-48 xl:px-50 max-h-screen">
-      <h2 className="text-2xl font-bold flex justify-between items-center">
+    <div className="p-4 lg:px-8 xl:px-10 max-h-screen flex flex-col">
+      <h2 className="text-2xl font-bold flex justify-between items-center mb-6">
         AI Interview Session Started
         <span className="flex items-center gap-2 text-gray-400">
           <Timer />
           {formatTime(interviewDuration)}
         </span>
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-7 mt-5">
-        <div className="bg-[rgb(16,23,39)] rounded-md p-10 border border-gray-600 flex  flex-col items-center justify-center gap-2">
-          <div className="relative w-[150px] h-[150px]">
-            {!activeUser && (
-              <span className="absolute top-0 left-0 w-full h-full rounded-full bg-blue-500 opacity-75 animate-ping z-0" />
-            )}
-            <Image
-              src={AI_RecruiterLogo}
-              alt="AI Interviewer"
-              width={150}
-              height={150}
-              className="rounded-full object-contain relative z-10"
-            />
-          </div>
-          <h2 className="text-lg font-bold text-zinc-200">AI Recruiter</h2>
-        </div>
-        {/* <div className="bg-[rgb(16,23,39)] rounded-md p-10 border border-gray-600 flex items-center justify-center">
-          <div className="bg-gray-500 rounded-full w-[150px] h-[150px] flex items-center justify-center">
-            <div className="relative w-[150px] h-[150px] flex items-center justify-center">
-              {activeUser && (
-                <span className="absolute top-0 left-0 w-full h-full rounded-full bg-blue-500 opacity-75 animate-ping z-0" />
-              )}
-              <h2 className="text-lg font-bold text-zinc-200 text-center z-10">
-                {interviewInfo?.userName}
-              </h2>
-            </div>
-          </div>
-        </div> */}
 
-        {/* Replace the second div with the webcam component */}
-        <div className="bg-[rgb(16,23,39)] rounded-md p-4 border border-gray-600 flex flex-col items-center justify-center">
-          <div className="w-full h-full flex flex-col items-center justify-center">
+      {/* Main Video Container */}
+      <div className="flex-1 flex flex-col items-center justify-center">
+        {/* Centered Webcam Container */}
+        <div className="relative w-full max-w-4xl h-[70vh] bg-[rgb(16,23,39)] rounded-md border border-gray-600 mx-auto">
+          {/* Webcam Feed - Centered */}
+          <div className="w-full h-full flex items-center justify-center">
             {isWebCamEnabled ? (
               <WebCam
+                ref={webcamRef}
                 audio={false}
+                videoConstraints={{
+                  facingMode: "user",
+                  width: { ideal: 1280 },
+                  height: { ideal: 720 },
+                }}
                 onUserMedia={() => setIsWebCamEnabled(true)}
                 onUserMediaError={() => {
                   setIsWebCamEnabled(false);
                   toast.error("Could not access webcam");
                 }}
-                className="w-full h-full max-h-[300px] object-cover rounded-md"
-                screenshotFormat="image/jpeg"
+                className="w-full h-full object-cover rounded-md"
               />
             ) : (
-              <div className="w-full h-[300px] bg-gray-800 rounded-md flex items-center justify-center">
+              <div className="w-full h-full bg-gray-800 rounded-md flex items-center justify-center">
                 <WebcamIcon className="w-24 h-24 text-gray-500" />
               </div>
             )}
-            {/* <Button
-              onClick={() => setIsWebCamEnabled(!isWebCamEnabled)}
-              className="mt-4"
-              variant={isWebCamEnabled ? "destructive" : "default"}
-            >
-              {isWebCamEnabled ? "Disable Webcam" : "Enable Webcam"}
-            </Button> */}
+          </div>
+
+          {/* AI Interviewer Small Overlay - Positioned absolutely */}
+          <div className="absolute bottom-4 right-4 w-32 h-32 rounded-full border-2 border-white overflow-hidden bg-[rgb(16,23,39)]">
+            <div className="relative w-full h-full flex items-center justify-center">
+              {!activeUser && (
+                <span className="absolute top-0 left-0 w-full h-full rounded-full bg-blue-500 opacity-75 animate-ping z-0" />
+              )}
+              <Image
+                src={AI_RecruiterLogo}
+                alt="AI Interviewer"
+                width={90}
+                height={90}
+                className="rounded-full object-contain relative z-10"
+              />
+            </div>
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-center gap-5 mt-5">
-        <Mic
-          className="h-12 w-12 bg-gray-500 p-3 rounded-full cursor-pointer"
-          onClick={startMic}
-        />
-        {/* <AlertConfirmation stopInterview={stopInterview}> */}
+
+      {/* Permission Request Modal */}
+      {showPermissionRequest && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+          <div className="bg-[rgb(16,23,39)] p-6 rounded-lg border border-gray-600 max-w-md">
+            <h3 className="text-xl font-bold mb-4">Permissions Required</h3>
+            <p className="mb-4">
+              Please allow microphone and camera access to continue with the
+              interview.
+            </p>
+            <div className="flex flex-col gap-2 mb-4">
+              <div className="flex items-center gap-2">
+                <Mic className="h-5 w-5" />
+                <span>Microphone: {micAllowed ? "Allowed" : "Denied"}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <WebcamIcon className="h-5 w-5" />
+                <span>Camera: {camAllowed ? "Allowed" : "Denied"}</span>
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => router.push("/generate")}
+              >
+                Cancel
+              </Button>
+              <Button onClick={requestAllPermissions}>Allow Permissions</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Controls */}
+
+      <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-5 mt-5">
+        <div className="flex gap-2 md:gap-5">
+          <div className="relative">
+            <Button
+              onClick={() => setShowPermissionRequest(true)}
+              variant={micAllowed ? "outline" : "default"}
+              className="gap-2 relative overflow-visible"
+              disabled={micAllowed}
+            >
+              <div className="relative flex items-center justify-center">
+                {activeUser && (
+                  <span className="absolute w-5 h-5 rounded-full bg-blue-500 opacity-75 animate-ping -z-10" />
+                )}
+                <Mic className="h-5 w-5" />
+              </div>
+              {micAllowed ? "Mic Active" : "Request Mic"}
+            </Button>
+          </div>
+          <Button
+            onClick={() => setShowPermissionRequest(true)}
+            variant={camAllowed ? "outline" : "default"}
+            className="gap-2"
+            disabled={camAllowed}
+          >
+            <WebcamIcon className="h-5 w-5" />
+            {camAllowed ? "Cam Active" : "Request Camera"}
+          </Button>
+        </div>
+
         {!loading ? (
-          <Phone
-            className="h-12 w-12 bg-red-500 p-3 rounded-full cursor-pointer"
+          <Button
+            variant="destructive"
             onClick={stopInterview}
-          />
+            className="gap-2 mt-2 md:mt-0"
+          >
+            <Phone className="h-5 w-5" />
+            End Interview
+          </Button>
         ) : (
-          <Loader2Icon className="animate-spin" />
+          <Loader2Icon className="animate-spin mt-2 md:mt-0" />
         )}
-        {/* </AlertConfirmation> */}
       </div>
+
       <h2 className="text-md font-bold mt-5 text-gray-500 text-center">
         Interview for {interviewInfo?.jobPosition} is in progress...
       </h2>
