@@ -1,11 +1,10 @@
 "use client";
-import { CheckCircle, Clock, Smile, Undo2, LayoutDashboard } from "lucide-react";
-import Link from "next/link";
+import { CheckCircle, Clock, Smile } from "lucide-react";
 import React from "react";
 
 const InterviewComplete = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[rgb(16,23,39)] text-white px-6 py-16">
+    <div className="min-h-screen flex flex-col items-center justify-center dark:bg-[rgb(16,23,39)] dark:text-white px-6 py-16">
       {/* Success icon */}
       <div className="relative mb-6">
         <span className="absolute inset-0 rounded-full bg-green-500 opacity-75 animate-ping" />
@@ -18,18 +17,19 @@ const InterviewComplete = () => {
       </h1>
 
       {/* Subtext */}
-      <p className="text-lg text-gray-400 text-center max-w-xl mb-8">
+      <p className="text-lg text-gray-500 dark:text-gray-400 text-center max-w-xl mb-8">
         Great job! You've successfully completed your interview session.
       </p>
 
       {/* What’s Next section */}
-      <div className="bg-[rgb(24,32,48)] rounded-xl border border-gray-700 p-6 w-full max-w-2xl shadow-lg mb-10">
+      <div className="dark:bg-[rgb(24,32,48)] rounded-xl border border-gray-700 p-6 w-full max-w-2xl shadow-lg mb-10">
         <div className="flex items-center gap-3 mb-4">
           <Clock className="text-indigo-400" />
           <h2 className="text-xl font-semibold">What’s Next?</h2>
         </div>
         <p className="text-gray-300 mb-2">
-          We’ll review your responses and get in touch with you soon regarding the next steps in the hiring process.
+          We’ll review your responses and get in touch with you soon regarding
+          the next steps in the hiring process.
         </p>
         <p className="text-sm text-gray-500">
           You can expect a detailed interview response within 2–3 business days.

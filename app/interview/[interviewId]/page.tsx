@@ -73,7 +73,7 @@ const Interview = () => {
   };
   return (
     <div className="px-10 md:px-24 lg:px-32 xl:px-44 mt-20">
-      <div className="w-full flex flex-col items-center justify-center border rounded-2xl px-20 py-10 bg-[rgb(16,23,39)]">
+      <div className="w-full flex flex-col items-center justify-center border rounded-2xl px-20 py-10 dark:bg-[rgb(16,23,39)]">
         <Image
           src={theme === "dark" ? LogoDark : Logo}
           alt="Recruitron"
@@ -88,7 +88,7 @@ const Interview = () => {
         />
 
         <h2 className="text-xl font-bold">{interviewData?.jobPosition}</h2>
-        <h2 className="flex items-center gap-2 text-gray-400 mt-2">
+        <h2 className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mt-2">
           <Clock /> {interviewData?.duration}
         </h2>
         <div className="w-full flex flex-col gap-2">
@@ -110,19 +110,21 @@ const Interview = () => {
           />
         </div>
 
-        <div className="bg-[rgba(255,255,255,0.1)] rounded-md p-5 w-full text-blue-500 mt-3">
+        <div className="dark:bg-[rgba(255,255,255,0.1)] rounded-md p-5 w-full text-blue-500 mt-3">
           <h2 className="flex items-center gap-2">
             <Info /> Before you begin
           </h2>
           <ul className="list-disc list-inside">
             <li>Make sure you have a stable internet connection</li>
             <li>Find a quiet and comfortable environment</li>
+            <li>Allow mic and cam permission</li>
+            <li>Cam feed will only be used for monitoring purpose</li>
           </ul>
         </div>
 
         <div className="w-full">
           <Button
-            className="mt-5 w-full cursor-pointer hover:bg-blue-600 hover:text-white transition-all duration-300 font-bold"
+            className="mt-5 w-full cursor-pointer hover:bg-blue-600 dark:hover:text-white hover:text-gray-500 transition-all duration-300 font-bold"
             disabled={loading || !userName || !interviewData}
             onClick={onJoinInterview}
           >
