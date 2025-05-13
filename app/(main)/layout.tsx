@@ -1,20 +1,14 @@
-import React from 'react'
-import DashboardProvider from './provider'
-import { Toaster } from '@/components/ui/sonner'
+import React from "react";
+import DashboardProvider from "./provider";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div>
       <DashboardProvider>
-        <div>
-        {children}
-        <Toaster position='top-right'
-        richColors
-        />
-        </div>
+        <div>{children}</div>
       </DashboardProvider>
     </div>
-  )
-}
+  );
+};
 
-export default DashboardLayout
+export default DashboardLayout;
