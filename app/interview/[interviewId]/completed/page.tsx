@@ -27,7 +27,7 @@ const InterviewComplete = () => {
           <Clock className="text-indigo-400" />
           <h2 className="text-xl font-semibold">What’s Next?</h2>
         </div>
-        <p className="text-gray-300 mb-2">
+        <p className="text-gray-400 dark:text-gray-300 mb-2">
           We’ll review your responses and get in touch with you soon regarding
           the next steps in the hiring process.
         </p>
