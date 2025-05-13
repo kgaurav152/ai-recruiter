@@ -379,7 +379,7 @@ const StartInterview = () => {
           <Button
             variant="destructive"
             onClick={stopInterview}
-            className="gap-2 mt-2 md:mt-0"
+            className="gap-2 mt-2 md:mt-0 cursor-pointer"
           >
             <Phone className="h-5 w-5" />
             End Interview
