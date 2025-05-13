@@ -9,20 +9,20 @@ const WelcomeContainer = () => {
   const { user } = userDetails();
   const router = useRouter();
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error("Logout failed:", error.message);
     } else {
       router.push("/auth"); // redirect to landing/login page
     }
-  }
+  };
   return (
     <div>
-      <div className=" bg-[rgb(16,23,39)] shadow-md rounded-md px-10 py-3 flex items-center justify-between">
+      <div className=" dark:bg-[rgb(16,23,39)] shadow-md rounded-md px-10 py-3 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold">Welcome Back , {user?.name}</h2>
-          <h2 className="text-blue-300">
+          <h2 className="text-blue-500 dark:text-blue-400">
             AI-Driven Interviews , Hiring Made Easy
           </h2>
         </div>
@@ -36,8 +36,11 @@ const WelcomeContainer = () => {
               className="rounded-full"
             />
           )}
-          <Button className="bg-transparent text-white cursor-pointer hover:bg-transparent hover:text-blue-600 " onClick={handleLogout}>
-            Logout <LogOutIcon size={30}/>
+          <Button
+            className="cursor-pointer hover:bg-transparent hover:text-blue-600 "
+            onClick={handleLogout}
+          >
+            Logout <LogOutIcon size={30} />
           </Button>
         </div>
       </div>

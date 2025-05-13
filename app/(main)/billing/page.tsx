@@ -43,11 +43,16 @@ const BillingPage = () => {
     }
   };
   return (
-    <div className="mt-10 min-h-screen bg-gradient-to-br from-slate-900 to-gray-950 p-10 text-white">
+    <div className="mt-10 min-h-screen dark:bg-gradient-to-br dark:from-slate-900 dark:not-even:to-gray-950 p-10 dark:text-white">
       <div className="max-w-4xl mx-auto text-center">
         <h1 className="text-4xl font-bold mb-3">Billing & Credits</h1>
-        <h2 className="text-2xl font-semibold mb-3">Your current credits: <span className="text-blue-400">{user?.credits}</span></h2>
-        <p className="text-gray-400 mb-10">
+        <h2 className="text-2xl font-semibold mb-3">
+          Your current credits:{" "}
+          <span className="text-blue-500 dark:text-blue-400">
+            {user?.credits}
+          </span>
+        </h2>
+        <p className="text-gray-500 dark:text-gray-400 mb-10">
           Add credits to continue creating AI interviews. Choose the best plan
           for your needs.
         </p>
@@ -55,16 +60,19 @@ const BillingPage = () => {
           {plans.map((plan) => (
             <Card
               key={plan.title}
-              className="bg-slate-800 border border-slate-700"
+              className="dark:bg-slate-800 border dark:border-slate-700"
             >
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
-                  <CreditCard className="text-blue-400" /> {plan.title}
+                <CardTitle className="flex items-center gap-2 dark:not-last:text-white">
+                  <CreditCard className="text-blue-500 dark:text-blue-400" />{" "}
+                  {plan.title}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-bold mb-2">{plan.price}</p>
-                <p className="text-sm text-gray-400 mb-4">{plan.description}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  {plan.description}
+                </p>
                 <Button
                   className="w-full bg-blue-600 hover:bg-blue-700"
                   onClick={() => handleCheckout(plan.stripePriceId as string)}

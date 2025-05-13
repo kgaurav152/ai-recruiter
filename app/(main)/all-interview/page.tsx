@@ -29,7 +29,7 @@ const AllInterview = () => {
     <div className="my-5">
       <h2 className="font-bold text-2xl">Previously Created Interviews</h2>
       {interviewsList.length === 0 && (
-        <div className="p-5 flex flex-col items-center gap-3 bg-[rgb(16,23,39)] rounded-md mt-5">
+        <div className="p-5 flex flex-col items-center gap-3 dark:bg-[rgb(16,23,39)] rounded-md mt-5">
           <Video className="h-10 w-10 text-blue-600" />
           <h2 className="text-md">You have not created any interviews</h2>
           <Link href="/dashboard/create-interview">
