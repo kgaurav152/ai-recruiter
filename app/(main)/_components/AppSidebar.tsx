@@ -10,17 +10,26 @@ import {
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import Logo from "@/assets/images/Recruitron.png";
+import LogoDark from "@/assets/images/Recruitron_Dark.png";
 import { Button } from "@/components/ui/button";
 import { BsPlus } from "react-icons/bs";
 import { SideBarOptions } from "@/services/Constants";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
+import { ModeToggle } from "@/components/theme-toggler";
+
 export function AppSidebar() {
+  const { theme } = useTheme();
   const path = usePathname();
   return (
     <Sidebar>
       <SidebarHeader className="flex items-center">
-        <Image src={Logo} alt="Recruitron" className="w-[200px] h-[150px]" />
+        <Image
+          src={theme === "dark" ? LogoDark : Logo}
+          alt="Recruitron"
+          className="w-[200px] h-[150px]"
+        />
         <Link href="/dashboard/create-interview" className="w-full">
           <Button className="w-full cursor-pointer">
             <BsPlus /> Create New Interview
@@ -48,7 +57,15 @@ export function AppSidebar() {
           </SidebarContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter>
+        <SidebarContent>
+          <SidebarMenu className="w-full cursor-pointer">
+            <SidebarMenuItem className="p-1 mt-auto">
+              <ModeToggle />
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarContent>
+      </SidebarFooter>
     </Sidebar>
   );
 }
