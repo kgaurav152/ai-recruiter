@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
-import logo from "@/assets/images/Recruitron.png";
+import Logo from "@/assets/images/Recruitron.png";
+import LogoDark from "@/assets/images/Recruitron_Dark.png";
 import jobInterview from "@/assets/images/job-interview.jpg";
 import { Clock, Info, Loader2Icon, Video } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,7 @@ import { supabase } from "@/services/supabaseClient";
 import { useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { InterviewDataContext } from "@/context/InterviewDataContext";
+import { useTheme } from "next-themes";
 interface interviewDataType {
   jobPosition: string;
   jobDescription: string;
@@ -29,6 +31,7 @@ const Interview = () => {
   const [loading, setLoading] = useState(false);
   //@ts-ignore
   const { interviewInfo, setInterviewInfo } = useContext(InterviewDataContext);
+  const { theme } = useTheme();
   const router = useRouter();
   useEffect(() => {
     interviewId && GetInterviewDetails();
@@ -71,7 +74,11 @@ const Interview = () => {
   return (
     <div className="px-10 md:px-24 lg:px-32 xl:px-44 mt-20">
       <div className="w-full flex flex-col items-center justify-center border rounded-2xl px-20 py-10 bg-[rgb(16,23,39)]">
-        <Image src={logo} alt="Recruitron" className="w-[240px] h-[140px]" />
+        <Image
+          src={theme === "dark" ? LogoDark : Logo}
+          alt="Recruitron"
+          className="w-[240px] h-[140px]"
+        />
         <h2 className=" text-2xl font-bold">AI-Powered Interview Platform</h2>
         <Image
           src={jobInterview}
